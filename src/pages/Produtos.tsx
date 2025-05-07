@@ -98,76 +98,18 @@ const Produtos = () => {
       </div>
 
       {/* Mensagem quando não há produtos */}
-      {produtosFiltrados.length === 0 && (
-        <div className="text-center py-10">
-          <Package className="mx-auto h-12 w-12 text-muted-foreground" />
-          <h3 className="mt-2 text-lg font-medium">Nenhum produto cadastrado</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Comece adicionando um novo produto ao seu catálogo.
-          </p>
-          <div className="mt-6">
-            <Button onClick={handleNovoProduto}>
-              <Plus className="mr-2 h-4 w-4" /> Adicionar Produto
-            </Button>
-          </div>
+      <div className="text-center py-10">
+        <Package className="mx-auto h-12 w-12 text-muted-foreground" />
+        <h3 className="mt-2 text-lg font-medium">Nenhum produto cadastrado</h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Comece adicionando um novo produto ao seu catálogo.
+        </p>
+        <div className="mt-6">
+          <Button onClick={handleNovoProduto}>
+            <Plus className="mr-2 h-4 w-4" /> Adicionar Produto
+          </Button>
         </div>
-      )}
-
-      {/* Tabela de produtos - só mostrar quando houver produtos */}
-      {produtosFiltrados.length > 0 && (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px]">ID</TableHead>
-                <TableHead>Produto</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead className="text-right">Preço</TableHead>
-                <TableHead className="text-center">Estoque</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {produtosFiltrados.map((produto) => (
-                <TableRow key={produto.id}>
-                  <TableCell className="font-medium">{produto.id}</TableCell>
-                  <TableCell>{produto.nome}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{produto.categoria}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {formatarPreco(produto.preco)}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <span className={`font-medium ${produto.estoque < produto.estoqueMinimo ? 'text-red-500' : 'text-green-600'}`}>
-                      {produto.estoque}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end">
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => handleEditarProduto(produto)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => handleExcluirProduto(produto)}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+      </div>
 
       {/* Dialog para adicionar/editar produto */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

@@ -6,25 +6,25 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
 } from 'recharts';
 
-// Dados de exemplo para os gráficos
+// Dados zerados para o dashboard
 const vendasMensais = [
-  { mes: 'Jan', valor: 4000 },
-  { mes: 'Fev', valor: 3000 },
-  { mes: 'Mar', valor: 5000 },
-  { mes: 'Abr', valor: 2780 },
-  { mes: 'Mai', valor: 1890 },
-  { mes: 'Jun', valor: 2390 },
+  { mes: 'Jan', valor: 0 },
+  { mes: 'Fev', valor: 0 },
+  { mes: 'Mar', valor: 0 },
+  { mes: 'Abr', valor: 0 },
+  { mes: 'Mai', valor: 0 },
+  { mes: 'Jun', valor: 0 },
 ];
 
 const Dashboard = () => {
-  // Dados fictícios para demonstração
+  // Dados zerados
   const estatisticas = {
-    totalProdutos: 143,
-    produtosBaixoEstoque: 8,
-    vendasHoje: 12,
-    valorVendasHoje: 'R$ 3.450,00',
-    contasReceber: 'R$ 7.830,00',
-    contasPagar: 'R$ 2.150,00'
+    totalProdutos: 0,
+    produtosBaixoEstoque: 0,
+    vendasHoje: 0,
+    valorVendasHoje: 'R$ 0,00',
+    contasReceber: 'R$ 0,00',
+    contasPagar: 'R$ 0,00'
   };
 
   return (
@@ -53,18 +53,18 @@ const Dashboard = () => {
           </CardContent>
         </Card>
         
-        <Card className="bg-amber-50">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-amber-900">
+            <CardTitle className="text-sm font-medium">
               Produtos em Baixa
             </CardTitle>
-            <AlertTriangle className="h-4 w-4 text-amber-500" />
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-amber-700">
+            <div className="text-2xl font-bold">
               {estatisticas.produtosBaixoEstoque}
             </div>
-            <p className="text-xs text-amber-600">
+            <p className="text-xs text-muted-foreground">
               Produtos com estoque crítico
             </p>
           </CardContent>
@@ -146,24 +146,10 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[
-                { nome: 'Produto A', estoque: 3, min: 5 },
-                { nome: 'Produto B', estoque: 2, min: 10 },
-                { nome: 'Produto C', estoque: 5, min: 8 },
-                { nome: 'Produto D', estoque: 1, min: 3 }
-              ].map((produto, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">{produto.nome}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Min: {produto.min}
-                    </p>
-                  </div>
-                  <div className="text-amber-600 font-semibold">
-                    {produto.estoque} un
-                  </div>
-                </div>
-              ))}
+              {/* Lista de produtos com estoque crítico vazia */}
+              <div className="flex items-center justify-center py-6 text-muted-foreground">
+                <p>Não há produtos com estoque crítico</p>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -29,6 +29,7 @@ import { toast } from "sonner";
 // Dados vazios para inicialização
 const vendasIniciais = [];
 
+// Resumo de vendas zerado
 const resumoVendas = {
   dia: 0,
   semana: 0,
@@ -144,7 +145,7 @@ const Vendas = () => {
           <CardContent className="p-4">
             <div className="text-sm text-muted-foreground">Ticket Médio</div>
             <div className="text-2xl font-bold mt-1">
-              {formatarValor(resumoVendas.quantidade.mes > 0 ? (resumoVendas.mes / resumoVendas.quantidade.mes) : 0)}
+              {formatarValor(0)}
             </div>
             <div className="text-xs mt-1">Média do mês</div>
           </CardContent>
@@ -164,72 +165,18 @@ const Vendas = () => {
       </div>
 
       {/* Mensagem quando não há vendas */}
-      {vendasFiltradas.length === 0 && (
-        <div className="text-center py-10">
-          <ShoppingBag className="mx-auto h-12 w-12 text-muted-foreground" />
-          <h3 className="mt-2 text-lg font-medium">Nenhuma venda registrada</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Comece registrando uma nova venda.
-          </p>
-          <div className="mt-6">
-            <Button onClick={handleNovaVenda}>
-              <Plus className="mr-2 h-4 w-4" /> Registrar Venda
-            </Button>
-          </div>
+      <div className="text-center py-10">
+        <ShoppingBag className="mx-auto h-12 w-12 text-muted-foreground" />
+        <h3 className="mt-2 text-lg font-medium">Nenhuma venda registrada</h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Comece registrando uma nova venda.
+        </p>
+        <div className="mt-6">
+          <Button onClick={handleNovaVenda}>
+            <Plus className="mr-2 h-4 w-4" /> Registrar Venda
+          </Button>
         </div>
-      )}
-
-      {/* Tabela de vendas - só mostrar quando houver vendas */}
-      {vendasFiltradas.length > 0 && (
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[80px]">Venda #</TableHead>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead className="text-center">Itens</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {vendasFiltradas.map((venda) => (
-                  <TableRow key={venda.id}>
-                    <TableCell className="font-medium">{venda.id}</TableCell>
-                    <TableCell>{venda.cliente}</TableCell>
-                    <TableCell>{formatarData(venda.data)}</TableCell>
-                    <TableCell className="text-center">{venda.itens}</TableCell>
-                    <TableCell className="text-right font-medium">{formatarValor(venda.total)}</TableCell>
-                    <TableCell>{getBadgeStatus(venda.status)}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end">
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleVerDetalhes(venda)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleExcluirVenda(venda)}
-                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
+      </div>
 
       {/* Dialog para nova venda */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
