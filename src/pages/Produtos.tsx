@@ -10,9 +10,20 @@ import {
   Dialog, DialogContent, DialogDescription, 
   DialogHeader, DialogTitle, DialogTrigger 
 } from "@/components/ui/dialog";
-import { Package, Plus, Edit, Search } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Package, Plus, Edit, Search, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { FormCadastroProduto } from '@/components/FormCadastroProduto';
+import { toast } from "sonner";
 
 // Dados fictícios de produtos para demonstração
 const produtosFicticios = [
@@ -62,9 +73,11 @@ const Produtos = () => {
   const [busca, setBusca] = useState('');
   const [produtoEditando, setProdutoEditando] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [produtos, setProdutos] = useState(produtosFicticios);
+  const [produtoParaExcluir, setProdutoParaExcluir] = useState<any>(null);
 
   // Filtrar produtos baseado na busca
-  const produtosFiltrados = produtosFicticios.filter(produto =>
+  const produtosFiltrados = produtos.filter(produto =>
     produto.nome.toLowerCase().includes(busca.toLowerCase()) ||
     produto.categoria.toLowerCase().includes(busca.toLowerCase())
   );
@@ -77,6 +90,20 @@ const Produtos = () => {
   const handleEditarProduto = (produto: any) => {
     setProdutoEditando(produto);
     setDialogOpen(true);
+  };
+  
+  const handleExcluirProduto = (produto: any) => {
+    setProdutoParaExcluir(produto);
+  };
+  
+  const confirmarExclusaoProduto = () => {
+    if (produtoParaExcluir) {
+      // Filtra o array removendo o produto com o ID correspondente
+      const novosProdutos = produtos.filter(p => p.id !== produtoParaExcluir.id);
+      setProdutos(novosProdutos);
+      toast.success(`Produto "${produtoParaExcluir.nome}" excluído com sucesso!`);
+      setProdutoParaExcluir(null);
+    }
   };
 
   const formatarPreco = (valor: number) => {
@@ -142,13 +169,23 @@ const Produtos = () => {
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => handleEditarProduto(produto)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
+                  <div className="flex justify-end">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => handleEditarProduto(produto)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => handleExcluirProduto(produto)}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -178,6 +215,31 @@ const Produtos = () => {
           
         </DialogContent>
       </Dialog>
+      
+      {/* AlertDialog para confirmação de exclusão */}
+      <AlertDialog 
+        open={!!produtoParaExcluir} 
+        onOpenChange={(open) => !open && setProdutoParaExcluir(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o produto "{produtoParaExcluir?.nome}"?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmarExclusaoProduto}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

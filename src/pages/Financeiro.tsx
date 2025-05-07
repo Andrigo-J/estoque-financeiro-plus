@@ -11,12 +11,23 @@ import {
   Dialog, DialogContent, DialogDescription,
   DialogHeader, DialogTitle, DialogTrigger
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from '@/components/ui/badge';
-import { Plus, Check, DollarSign } from 'lucide-react';
+import { Plus, Check, DollarSign, Trash2 } from 'lucide-react';
 import { FormFinanceiro } from '@/components/FormFinanceiro';
+import { toast } from "sonner";
 
 // Dados fictícios para demonstração
-const contasDados = {
+const contasDadosIniciais = {
   receber: [
     { 
       id: 1, 
@@ -83,6 +94,8 @@ const Financeiro = () => {
   const [tipoOperacao, setTipoOperacao] = useState('');
   const [itemEditando, setItemEditando] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [contasDados, setContasDados] = useState(contasDadosIniciais);
+  const [contaParaExcluir, setContaParaExcluir] = useState<{id: number, tipo: string} | null>(null);
 
   const handleNovaConta = (tipo: string) => {
     setTipoOperacao(tipo);
@@ -91,8 +104,42 @@ const Financeiro = () => {
   };
 
   const handleQuitarConta = (item: any, tipo: string) => {
-    console.log(`Quitando conta ${tipo} - ID: ${item.id}`);
-    // Em uma aplicação real, aqui atualizaria o status no banco de dados
+    // Atualiza o status para 'pago'
+    const novaListaContas = [...contasDados[tipo as 'receber' | 'pagar']];
+    const indice = novaListaContas.findIndex(conta => conta.id === item.id);
+    
+    if (indice !== -1) {
+      novaListaContas[indice] = { ...novaListaContas[indice], status: 'pago' };
+      
+      setContasDados({
+        ...contasDados,
+        [tipo]: novaListaContas
+      });
+      
+      toast.success(`Conta ${tipo === 'receber' ? 'recebida' : 'paga'} com sucesso!`);
+    }
+  };
+  
+  const handleExcluirConta = (item: any, tipo: string) => {
+    setContaParaExcluir({ id: item.id, tipo });
+  };
+  
+  const confirmarExclusaoConta = () => {
+    if (contaParaExcluir) {
+      const { id, tipo } = contaParaExcluir;
+      const tipoChave = tipo as 'receber' | 'pagar';
+      
+      // Filtra a lista removendo a conta com o ID correspondente
+      const novaListaContas = contasDados[tipoChave].filter(conta => conta.id !== id);
+      
+      setContasDados({
+        ...contasDados,
+        [tipo]: novaListaContas
+      });
+      
+      toast.success(`Conta ${tipo === 'receber' ? 'a receber' : 'a pagar'} excluída com sucesso!`);
+      setContaParaExcluir(null);
+    }
   };
 
   const formatarData = (dataString: string) => {
@@ -163,14 +210,26 @@ const Financeiro = () => {
                       <TableCell className="text-right">{formatarValor(conta.valor)}</TableCell>
                       <TableCell>{getBadgeStatus(conta.status)}</TableCell>
                       <TableCell className="text-right">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="h-8 px-2 lg:px-3"
-                          onClick={() => handleQuitarConta(conta, 'receber')}
-                        >
-                          <Check className="mr-2 h-3 w-3" /> Receber
-                        </Button>
+                        <div className="flex justify-end gap-1">
+                          {conta.status !== 'pago' && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="h-8 px-2 lg:px-3"
+                              onClick={() => handleQuitarConta(conta, 'receber')}
+                            >
+                              <Check className="mr-2 h-3 w-3" /> Receber
+                            </Button>
+                          )}
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => handleExcluirConta(conta, 'receber')}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -210,14 +269,26 @@ const Financeiro = () => {
                       <TableCell className="text-right">{formatarValor(conta.valor)}</TableCell>
                       <TableCell>{getBadgeStatus(conta.status)}</TableCell>
                       <TableCell className="text-right">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="h-8 px-2 lg:px-3"
-                          onClick={() => handleQuitarConta(conta, 'pagar')}
-                        >
-                          <DollarSign className="mr-2 h-3 w-3" /> Pagar
-                        </Button>
+                        <div className="flex justify-end gap-1">
+                          {conta.status !== 'pago' && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="h-8 px-2 lg:px-3"
+                              onClick={() => handleQuitarConta(conta, 'pagar')}
+                            >
+                              <DollarSign className="mr-2 h-3 w-3" /> Pagar
+                            </Button>
+                          )}
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => handleExcluirConta(conta, 'pagar')}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -251,6 +322,31 @@ const Financeiro = () => {
           
         </DialogContent>
       </Dialog>
+      
+      {/* AlertDialog para confirmação de exclusão */}
+      <AlertDialog 
+        open={!!contaParaExcluir} 
+        onOpenChange={(open) => !open && setContaParaExcluir(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta conta?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmarExclusaoConta}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

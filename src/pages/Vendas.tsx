@@ -10,14 +10,25 @@ import {
   Dialog, DialogContent, DialogDescription, 
   DialogHeader, DialogTitle 
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Eye, Search } from 'lucide-react';
+import { Plus, Eye, Search, Trash2 } from 'lucide-react';
 import { FormNovaVenda } from '@/components/FormNovaVenda';
+import { toast } from "sonner";
 
 // Dados fictícios para demonstração
-const vendas = [
+const vendasIniciais = [
   {
     id: 1056,
     cliente: "Empresa A",
@@ -75,6 +86,8 @@ const Vendas = () => {
   const [busca, setBusca] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [vendaDetalhes, setVendaDetalhes] = useState<any>(null);
+  const [vendas, setVendas] = useState(vendasIniciais);
+  const [vendaParaExcluir, setVendaParaExcluir] = useState<any>(null);
 
   // Filtrar vendas baseado na busca
   const vendasFiltradas = vendas.filter(venda =>
@@ -88,6 +101,20 @@ const Vendas = () => {
   
   const handleVerDetalhes = (venda: any) => {
     setVendaDetalhes(venda);
+  };
+  
+  const handleExcluirVenda = (venda: any) => {
+    setVendaParaExcluir(venda);
+  };
+  
+  const confirmarExclusaoVenda = () => {
+    if (vendaParaExcluir) {
+      // Filtra o array removendo a venda com o ID correspondente
+      const novasVendas = vendas.filter(v => v.id !== vendaParaExcluir.id);
+      setVendas(novasVendas);
+      toast.success(`Venda #${vendaParaExcluir.id} excluída com sucesso!`);
+      setVendaParaExcluir(null);
+    }
   };
 
   const formatarData = (dataString: string) => {
@@ -203,13 +230,23 @@ const Vendas = () => {
                   <TableCell className="text-right font-medium">{formatarValor(venda.total)}</TableCell>
                   <TableCell>{getBadgeStatus(venda.status)}</TableCell>
                   <TableCell className="text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handleVerDetalhes(venda)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
+                    <div className="flex justify-end">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleVerDetalhes(venda)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleExcluirVenda(venda)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -307,6 +344,31 @@ const Vendas = () => {
           </DialogContent>
         </Dialog>
       )}
+      
+      {/* AlertDialog para confirmação de exclusão */}
+      <AlertDialog 
+        open={!!vendaParaExcluir} 
+        onOpenChange={(open) => !open && setVendaParaExcluir(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir a venda #{vendaParaExcluir?.id}?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmarExclusaoVenda}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
