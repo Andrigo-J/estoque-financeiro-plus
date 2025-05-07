@@ -10,6 +10,9 @@ import Produtos from "./pages/Produtos";
 import Vendas from "./pages/Vendas";
 import Financeiro from "./pages/Financeiro";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -19,41 +22,53 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={
-            <Layout>
-              <Dashboard />
-            </Layout>
-          } />
-          <Route path="/produtos" element={
-            <Layout>
-              <Produtos />
-            </Layout>
-          } />
-          <Route path="/vendas" element={
-            <Layout>
-              <Vendas />
-            </Layout>
-          } />
-          <Route path="/financeiro" element={
-            <Layout>
-              <Financeiro />
-            </Layout>
-          } />
-          <Route path="/configuracoes" element={
-            <Layout>
-              <div className="space-y-6">
-                <h1 className="text-2xl font-bold tracking-tight">Configurações</h1>
-                <p>Configurações do sistema (em desenvolvimento)</p>
-              </div>
-            </Layout>
-          } />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Dashboard />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/produtos" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Produtos />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/vendas" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Vendas />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/financeiro" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Financeiro />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/configuracoes" element={
+              <ProtectedRoute>
+                <Layout>
+                  <div className="space-y-6">
+                    <h1 className="text-2xl font-bold tracking-tight">Configurações</h1>
+                    <p>Configurações do sistema (em desenvolvimento)</p>
+                  </div>
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
 
 export default App;
-
