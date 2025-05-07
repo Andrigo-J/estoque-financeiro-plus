@@ -34,9 +34,10 @@ type ProdutoFormValues = z.infer<typeof produtoSchema>;
 interface FormCadastroProdutoProps {
   produtoEditando?: any;
   onClose: () => void;
+  categorias: string[];
 }
 
-export function FormCadastroProduto({ produtoEditando, onClose }: FormCadastroProdutoProps) {
+export function FormCadastroProduto({ produtoEditando, onClose, categorias }: FormCadastroProdutoProps) {
   // Definir valores padrão do formulário
   const defaultValues: Partial<ProdutoFormValues> = {
     nome: produtoEditando?.nome || "",
@@ -93,11 +94,13 @@ export function FormCadastroProduto({ produtoEditando, onClose }: FormCadastroPr
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Eletrônicos">Eletrônicos</SelectItem>
-                    <SelectItem value="Periféricos">Periféricos</SelectItem>
-                    <SelectItem value="Móveis">Móveis</SelectItem>
-                    <SelectItem value="Informática">Informática</SelectItem>
-                    <SelectItem value="Papelaria">Papelaria</SelectItem>
+                    {categorias.length > 0 ? (
+                      categorias.map((categoria) => (
+                        <SelectItem key={categoria} value={categoria}>{categoria}</SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="" disabled>Sem categorias cadastradas</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
                 <FormMessage />
