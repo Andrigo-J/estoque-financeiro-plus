@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,62 +22,21 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Eye, Search, Trash2 } from 'lucide-react';
+import { Plus, Eye, Search, Trash2, ShoppingBag } from 'lucide-react';
 import { FormNovaVenda } from '@/components/FormNovaVenda';
 import { toast } from "sonner";
 
-// Dados fictícios para demonstração
-const vendasIniciais = [
-  {
-    id: 1056,
-    cliente: "Empresa A",
-    data: "2025-05-06",
-    total: 2500.0,
-    status: "finalizada",
-    itens: 5
-  },
-  {
-    id: 1055,
-    cliente: "João Silva",
-    data: "2025-05-05",
-    total: 450.0,
-    status: "finalizada",
-    itens: 2
-  },
-  {
-    id: 1054,
-    cliente: "Maria Souza",
-    data: "2025-05-05",
-    total: 780.0,
-    status: "finalizada",
-    itens: 3
-  },
-  {
-    id: 1053,
-    cliente: "Empresa B",
-    data: "2025-05-04",
-    total: 1200.0,
-    status: "finalizada",
-    itens: 7
-  },
-  {
-    id: 1052,
-    cliente: "Carlos Oliveira",
-    data: "2025-05-03",
-    total: 350.0,
-    status: "cancelada",
-    itens: 2
-  }
-];
+// Dados vazios para inicialização
+const vendasIniciais = [];
 
 const resumoVendas = {
-  dia: 3730.0,
-  semana: 5280.0,
-  mes: 12450.0,
+  dia: 0,
+  semana: 0,
+  mes: 0,
   quantidade: {
-    dia: 3,
-    semana: 5,
-    mes: 12
+    dia: 0,
+    semana: 0,
+    mes: 0
   }
 };
 
@@ -186,7 +144,7 @@ const Vendas = () => {
           <CardContent className="p-4">
             <div className="text-sm text-muted-foreground">Ticket Médio</div>
             <div className="text-2xl font-bold mt-1">
-              {formatarValor(resumoVendas.mes / resumoVendas.quantidade.mes)}
+              {formatarValor(resumoVendas.quantidade.mes > 0 ? (resumoVendas.mes / resumoVendas.quantidade.mes) : 0)}
             </div>
             <div className="text-xs mt-1">Média do mês</div>
           </CardContent>
@@ -205,55 +163,73 @@ const Vendas = () => {
         />
       </div>
 
-      {/* Tabela de vendas */}
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[80px]">Venda #</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Data</TableHead>
-                <TableHead className="text-center">Itens</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {vendasFiltradas.map((venda) => (
-                <TableRow key={venda.id}>
-                  <TableCell className="font-medium">{venda.id}</TableCell>
-                  <TableCell>{venda.cliente}</TableCell>
-                  <TableCell>{formatarData(venda.data)}</TableCell>
-                  <TableCell className="text-center">{venda.itens}</TableCell>
-                  <TableCell className="text-right font-medium">{formatarValor(venda.total)}</TableCell>
-                  <TableCell>{getBadgeStatus(venda.status)}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end">
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => handleVerDetalhes(venda)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => handleExcluirVenda(venda)}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+      {/* Mensagem quando não há vendas */}
+      {vendasFiltradas.length === 0 && (
+        <div className="text-center py-10">
+          <ShoppingBag className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-2 text-lg font-medium">Nenhuma venda registrada</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Comece registrando uma nova venda.
+          </p>
+          <div className="mt-6">
+            <Button onClick={handleNovaVenda}>
+              <Plus className="mr-2 h-4 w-4" /> Registrar Venda
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Tabela de vendas - só mostrar quando houver vendas */}
+      {vendasFiltradas.length > 0 && (
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[80px]">Venda #</TableHead>
+                  <TableHead>Cliente</TableHead>
+                  <TableHead>Data</TableHead>
+                  <TableHead className="text-center">Itens</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {vendasFiltradas.map((venda) => (
+                  <TableRow key={venda.id}>
+                    <TableCell className="font-medium">{venda.id}</TableCell>
+                    <TableCell>{venda.cliente}</TableCell>
+                    <TableCell>{formatarData(venda.data)}</TableCell>
+                    <TableCell className="text-center">{venda.itens}</TableCell>
+                    <TableCell className="text-right font-medium">{formatarValor(venda.total)}</TableCell>
+                    <TableCell>{getBadgeStatus(venda.status)}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleVerDetalhes(venda)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleExcluirVenda(venda)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Dialog para nova venda */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

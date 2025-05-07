@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,49 +24,8 @@ import { Badge } from '@/components/ui/badge';
 import { FormCadastroProduto } from '@/components/FormCadastroProduto';
 import { toast } from "sonner";
 
-// Dados fictícios de produtos para demonstração
-const produtosFicticios = [
-  { 
-    id: 1, 
-    nome: 'Notebook Dell Inspiron', 
-    categoria: 'Eletrônicos',
-    preco: 3499.90, 
-    estoque: 15,
-    estoqueMinimo: 5
-  },
-  { 
-    id: 2, 
-    nome: 'Monitor LG 24"', 
-    categoria: 'Eletrônicos',
-    preco: 899.90, 
-    estoque: 3,
-    estoqueMinimo: 5
-  },
-  { 
-    id: 3, 
-    nome: 'Teclado Mecânico Logitech', 
-    categoria: 'Periféricos',
-    preco: 349.90, 
-    estoque: 8,
-    estoqueMinimo: 4
-  },
-  { 
-    id: 4, 
-    nome: 'Mouse sem fio Microsoft', 
-    categoria: 'Periféricos',
-    preco: 129.90, 
-    estoque: 12,
-    estoqueMinimo: 5
-  },
-  { 
-    id: 5, 
-    nome: 'Cadeira de Escritório Ergonômica', 
-    categoria: 'Móveis',
-    preco: 799.90, 
-    estoque: 2,
-    estoqueMinimo: 3
-  },
-];
+// Dados iniciais vazios
+const produtosFicticios = [];
 
 const Produtos = () => {
   const [busca, setBusca] = useState('');
@@ -78,8 +36,8 @@ const Produtos = () => {
 
   // Filtrar produtos baseado na busca
   const produtosFiltrados = produtos.filter(produto =>
-    produto.nome.toLowerCase().includes(busca.toLowerCase()) ||
-    produto.categoria.toLowerCase().includes(busca.toLowerCase())
+    produto.nome?.toLowerCase().includes(busca.toLowerCase()) ||
+    produto.categoria?.toLowerCase().includes(busca.toLowerCase())
   );
 
   const handleNovoProduto = () => {
@@ -139,59 +97,77 @@ const Produtos = () => {
         />
       </div>
 
-      {/* Tabela de produtos */}
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]">ID</TableHead>
-              <TableHead>Produto</TableHead>
-              <TableHead>Categoria</TableHead>
-              <TableHead className="text-right">Preço</TableHead>
-              <TableHead className="text-center">Estoque</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {produtosFiltrados.map((produto) => (
-              <TableRow key={produto.id}>
-                <TableCell className="font-medium">{produto.id}</TableCell>
-                <TableCell>{produto.nome}</TableCell>
-                <TableCell>
-                  <Badge variant="secondary">{produto.categoria}</Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatarPreco(produto.preco)}
-                </TableCell>
-                <TableCell className="text-center">
-                  <span className={`font-medium ${produto.estoque < produto.estoqueMinimo ? 'text-red-500' : 'text-green-600'}`}>
-                    {produto.estoque}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end">
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handleEditarProduto(produto)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handleExcluirProduto(produto)}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
+      {/* Mensagem quando não há produtos */}
+      {produtosFiltrados.length === 0 && (
+        <div className="text-center py-10">
+          <Package className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-2 text-lg font-medium">Nenhum produto cadastrado</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Comece adicionando um novo produto ao seu catálogo.
+          </p>
+          <div className="mt-6">
+            <Button onClick={handleNovoProduto}>
+              <Plus className="mr-2 h-4 w-4" /> Adicionar Produto
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Tabela de produtos - só mostrar quando houver produtos */}
+      {produtosFiltrados.length > 0 && (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[50px]">ID</TableHead>
+                <TableHead>Produto</TableHead>
+                <TableHead>Categoria</TableHead>
+                <TableHead className="text-right">Preço</TableHead>
+                <TableHead className="text-center">Estoque</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {produtosFiltrados.map((produto) => (
+                <TableRow key={produto.id}>
+                  <TableCell className="font-medium">{produto.id}</TableCell>
+                  <TableCell>{produto.nome}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{produto.categoria}</Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {formatarPreco(produto.preco)}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className={`font-medium ${produto.estoque < produto.estoqueMinimo ? 'text-red-500' : 'text-green-600'}`}>
+                      {produto.estoque}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleEditarProduto(produto)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleExcluirProduto(produto)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       {/* Dialog para adicionar/editar produto */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -210,7 +186,7 @@ const Produtos = () => {
 
           <FormCadastroProduto 
             produtoEditando={produtoEditando} 
-            onClose={() => setDialogOpen(false)} 
+            onClose={() => setDialogOpen(false)}
           />
           
         </DialogContent>

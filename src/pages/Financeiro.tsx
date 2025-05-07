@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,72 +21,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from '@/components/ui/badge';
-import { Plus, Check, DollarSign, Trash2 } from 'lucide-react';
+import { Plus, Check, DollarSign, Trash2, CreditCard, Receipt } from 'lucide-react';
 import { FormFinanceiro } from '@/components/FormFinanceiro';
 import { toast } from "sonner";
 
-// Dados fictícios para demonstração
+// Dados iniciais vazios
 const contasDadosIniciais = {
-  receber: [
-    { 
-      id: 1, 
-      descricao: 'Venda #1056', 
-      cliente: 'Empresa A',
-      valor: 2500.0, 
-      vencimento: '2025-05-15',
-      status: 'pendente'
-    },
-    { 
-      id: 2, 
-      descricao: 'Venda #1032', 
-      cliente: 'Empresa B',
-      valor: 1200.0, 
-      vencimento: '2025-05-12',
-      status: 'pendente'
-    },
-    { 
-      id: 3, 
-      descricao: 'Venda #1028', 
-      cliente: 'João Silva',
-      valor: 450.0, 
-      vencimento: '2025-05-08',
-      status: 'pendente'
-    },
-    { 
-      id: 4, 
-      descricao: 'Venda #1024', 
-      cliente: 'Maria Souza',
-      valor: 780.0, 
-      vencimento: '2025-05-03',
-      status: 'atrasado'
-    }
-  ],
-  pagar: [
-    { 
-      id: 1, 
-      descricao: 'Aluguel', 
-      fornecedor: 'Imobiliária XYZ',
-      valor: 1800.0, 
-      vencimento: '2025-05-10',
-      status: 'pendente'
-    },
-    { 
-      id: 2, 
-      descricao: 'Energia Elétrica', 
-      fornecedor: 'Companhia Elétrica',
-      valor: 350.0, 
-      vencimento: '2025-05-15',
-      status: 'pendente'
-    },
-    { 
-      id: 3, 
-      descricao: 'Internet', 
-      fornecedor: 'Provedor Net',
-      valor: 120.0, 
-      vencimento: '2025-05-20',
-      status: 'pendente'
-    }
-  ]
+  receber: [],
+  pagar: []
 };
 
 const Financeiro = () => {
@@ -188,55 +129,74 @@ const Financeiro = () => {
             </Button>
           </div>
 
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Descrição</TableHead>
-                    <TableHead>Cliente</TableHead>
-                    <TableHead>Vencimento</TableHead>
-                    <TableHead className="text-right">Valor</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {contasDados.receber.map((conta) => (
-                    <TableRow key={conta.id}>
-                      <TableCell className="font-medium">{conta.descricao}</TableCell>
-                      <TableCell>{conta.cliente}</TableCell>
-                      <TableCell>{formatarData(conta.vencimento)}</TableCell>
-                      <TableCell className="text-right">{formatarValor(conta.valor)}</TableCell>
-                      <TableCell>{getBadgeStatus(conta.status)}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          {conta.status !== 'pago' && (
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              className="h-8 px-2 lg:px-3"
-                              onClick={() => handleQuitarConta(conta, 'receber')}
-                            >
-                              <Check className="mr-2 h-3 w-3" /> Receber
-                            </Button>
-                          )}
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => handleExcluirConta(conta, 'receber')}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </TableCell>
+          {/* Mensagem quando não há contas a receber */}
+          {contasDados.receber.length === 0 && (
+            <div className="text-center py-10 border rounded-lg">
+              <Receipt className="mx-auto h-12 w-12 text-muted-foreground" />
+              <h3 className="mt-2 text-lg font-medium">Nenhuma conta a receber</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Adicione uma nova conta a receber para começar.
+              </p>
+              <div className="mt-6">
+                <Button onClick={() => handleNovaConta('receber')}>
+                  <Plus className="mr-2 h-4 w-4" /> Nova Conta a Receber
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Tabela de contas a receber - só mostrar quando houver contas */}
+          {contasDados.receber.length > 0 && (
+            <Card>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Descrição</TableHead>
+                      <TableHead>Cliente</TableHead>
+                      <TableHead>Vencimento</TableHead>
+                      <TableHead className="text-right">Valor</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                  </TableHeader>
+                  <TableBody>
+                    {contasDados.receber.map((conta) => (
+                      <TableRow key={conta.id}>
+                        <TableCell className="font-medium">{conta.descricao}</TableCell>
+                        <TableCell>{conta.cliente}</TableCell>
+                        <TableCell>{formatarData(conta.vencimento)}</TableCell>
+                        <TableCell className="text-right">{formatarValor(conta.valor)}</TableCell>
+                        <TableCell>{getBadgeStatus(conta.status)}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            {conta.status !== 'pago' && (
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="h-8 px-2 lg:px-3"
+                                onClick={() => handleQuitarConta(conta, 'receber')}
+                              >
+                                <Check className="mr-2 h-3 w-3" /> Receber
+                              </Button>
+                            )}
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                              onClick={() => handleExcluirConta(conta, 'receber')}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="pagar" className="space-y-4">
@@ -247,55 +207,74 @@ const Financeiro = () => {
             </Button>
           </div>
 
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Descrição</TableHead>
-                    <TableHead>Fornecedor</TableHead>
-                    <TableHead>Vencimento</TableHead>
-                    <TableHead className="text-right">Valor</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {contasDados.pagar.map((conta) => (
-                    <TableRow key={conta.id}>
-                      <TableCell className="font-medium">{conta.descricao}</TableCell>
-                      <TableCell>{conta.fornecedor}</TableCell>
-                      <TableCell>{formatarData(conta.vencimento)}</TableCell>
-                      <TableCell className="text-right">{formatarValor(conta.valor)}</TableCell>
-                      <TableCell>{getBadgeStatus(conta.status)}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          {conta.status !== 'pago' && (
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              className="h-8 px-2 lg:px-3"
-                              onClick={() => handleQuitarConta(conta, 'pagar')}
-                            >
-                              <DollarSign className="mr-2 h-3 w-3" /> Pagar
-                            </Button>
-                          )}
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => handleExcluirConta(conta, 'pagar')}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </TableCell>
+          {/* Mensagem quando não há contas a pagar */}
+          {contasDados.pagar.length === 0 && (
+            <div className="text-center py-10 border rounded-lg">
+              <CreditCard className="mx-auto h-12 w-12 text-muted-foreground" />
+              <h3 className="mt-2 text-lg font-medium">Nenhuma conta a pagar</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Adicione uma nova conta a pagar para começar.
+              </p>
+              <div className="mt-6">
+                <Button onClick={() => handleNovaConta('pagar')}>
+                  <Plus className="mr-2 h-4 w-4" /> Nova Conta a Pagar
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Tabela de contas a pagar - só mostrar quando houver contas */}
+          {contasDados.pagar.length > 0 && (
+            <Card>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Descrição</TableHead>
+                      <TableHead>Fornecedor</TableHead>
+                      <TableHead>Vencimento</TableHead>
+                      <TableHead className="text-right">Valor</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                  </TableHeader>
+                  <TableBody>
+                    {contasDados.pagar.map((conta) => (
+                      <TableRow key={conta.id}>
+                        <TableCell className="font-medium">{conta.descricao}</TableCell>
+                        <TableCell>{conta.fornecedor}</TableCell>
+                        <TableCell>{formatarData(conta.vencimento)}</TableCell>
+                        <TableCell className="text-right">{formatarValor(conta.valor)}</TableCell>
+                        <TableCell>{getBadgeStatus(conta.status)}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            {conta.status !== 'pago' && (
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="h-8 px-2 lg:px-3"
+                                onClick={() => handleQuitarConta(conta, 'pagar')}
+                              >
+                                <DollarSign className="mr-2 h-3 w-3" /> Pagar
+                              </Button>
+                            )}
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                              onClick={() => handleExcluirConta(conta, 'pagar')}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
 
